@@ -1,6 +1,6 @@
 blueprint:
     name: IKEA Rodret Use with Zigbee2MQTT
-    description: '## Control Light(s) with IKEA RODRET Dimmer remote (v1.0)
+    description: '## Control Light(s) with IKEA RODRET (E2201) Dimmer remote (v1.0)
 
 
                   Only for use with Zigbee2MQTT
