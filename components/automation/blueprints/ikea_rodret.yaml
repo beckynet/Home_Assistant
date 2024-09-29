@@ -24,8 +24,6 @@ blueprint:
               - domain: light
             multiple: true
 
-source_url: https://github.com/beckynet/Home_Assistant/blob/main/components/automation/blueprints/ikea_rodret.yaml
-
 variables:
   remote_control: !input rodret_entity
   light_entities: !input target_lights
