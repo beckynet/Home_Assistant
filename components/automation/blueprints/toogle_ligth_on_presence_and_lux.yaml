@@ -1,0 +1,100 @@
+blueprint:
+    name: Toggle Light On Presence And Lux Value
+    description: Toggle a Light Based On a Presence Sensor And a Lux Value
+    domain: automation
+    author: Beckynet
+    homeassistant:
+      min_version: 2024.8.0
+    input:
+        presence_entity:
+          name: Presence Sensor
+          description: The presence detector that acts as a trigger
+          selector:
+            entity:
+              filter:
+                domain:
+                  - binary_sensor
+                device_class: 
+                  - occupancy
+                  - presence
+                  - motion
+        illuminance_entity:
+          name: Illuminance Sensor
+          description: The luminance sensor that measures light
+          selector:
+            entity:
+              filter:
+                domain:
+                  - sensor
+                device_class: illuminance
+        illuminance_value:
+          name: Illuminance Value (Lux)
+          description: The light will turn on only if the lux is below this value
+          default: "100"
+        wait_time:
+          name: Wait Time
+          description: Time to leave the light on after no presence is reported
+          selector:
+            number:
+              mode: slider
+              min: 0
+              max: 720
+              step: 15
+              unit_of_measurement: seconds
+          default: 60
+        light_target:
+          name: Light
+          description: Light(s) or Ligth group to control
+          selector:
+            entity:
+              filter:
+                domain:
+                  - light
+              multiple: true
+mode: single
+
+variables:
+  automation_name: '{{ this.attributes.last_triggered }}'
+
+trigger:
+  - platform: state
+    entity_id: !input presence_entity
+    from: "off"
+    to: "on"
+    id: "on"
+  - platform: state
+    entity_id: !input presence_entity
+    from: "on"
+    to: "off"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: !input wait_time
+    id: "off"
+condition: []
+action:
+  - if:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id:
+              - "on"
+          - condition: numeric_state
+            entity_id: !input illuminance_entity
+            below: !input illuminance_value
+    then:
+      - target:
+          entity_id: !input light_target
+        data: {}
+        action: light.turn_on
+  - if:
+      - condition: and
+        conditions:
+          - condition: trigger
+            id:
+              - "off"
+    then:
+      - target:
+          entity_id: !input light_target
+        data: {}
+        action: light.turn_off
