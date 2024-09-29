@@ -3,6 +3,8 @@ blueprint:
     description: Control Light Entity(ies)
     domain: automation
     author: Beckynet
+    homeassistant:
+      min_version: 2024.8.0
     input:
       rodret_entity:
         name: Rodret remote
@@ -21,6 +23,8 @@ blueprint:
             filter:
               - domain: light
             multiple: true
+
+source_url: https://github.com/beckynet/Home_Assistant/blob/main/components/automation/blueprints/ikea_rodret.yaml
 
 variables:
   remote_control: !input rodret_entity
