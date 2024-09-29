@@ -1,6 +1,25 @@
 blueprint:
     name: IKEA Styrbar Use with Zigbee2MQTT
-    description: Ikea STYRBAR E2001/E2002 connected by Zigbee2MQTT to control Light
+    description: '## Control Light(s) with IKEA STYRBAR (E2001/E2002) Dimmer remote (v1.0)
+
+
+                  Only for use with Zigbee2MQTT
+                  (cf [MQTT](https://www.home-assistant.io/integrations/mqtt) + [Z2M addon](https://github.com/zigbee2mqtt/hassio-zigbee2mqtt#installation).
+
+
+                  Available controls:
+
+                  - Press the **Brigthness Up** button to turn on the light(s)
+
+                  - Press the **Brigthness Down** button to turn off the light(s)
+
+                  - Press and hold the **Brigthness Up** button to increase the brightness
+
+                  - Press and hold the **Brigthness Down** button to decrease the brightness down to 10%
+                
+                  - Press the **Left Arrow** button to decrease the kelvin to down of 2000
+
+                  - Press the **Right Arrow** button to increase the kelvin to up of 6535'
     domain: automation
     author: Beckynet
     input:
@@ -197,4 +216,5 @@ action:
                 {% else %}
                   {{ new_kelvin }}
                 {% endif %}
+
 mode: single
