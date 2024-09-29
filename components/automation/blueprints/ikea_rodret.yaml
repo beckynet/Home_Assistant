@@ -1,6 +1,21 @@
 blueprint:
     name: IKEA Rodret Use with Zigbee2MQTT
-    description: Control Light Entity(ies)
+    description: '## Control Light(s) with IKEA RODRET Dimmer remote (v1.0)
+
+
+                  Only for use with Zigbee2MQTT
+                  (cf [MQTT](https://www.home-assistant.io/integrations/mqtt) + [Z2M addon](https://github.com/zigbee2mqtt/hassio-zigbee2mqtt#installation)).
+
+
+                  Available controls:
+
+                  - Press the **on** button to turn on the light(s)
+
+                  - Press the **off** button to turn off the light(s)
+
+                  - Press and hold the **on** button to increase the brightness
+
+                  - Press and hold the **off** button to decrease the brightness down to 10%'
     domain: automation
     author: Beckynet
     homeassistant:
@@ -132,4 +147,5 @@ action:
                 {% else %}
                   {{ new_brightness }}
                 {% endif %}
+
 mode: single
