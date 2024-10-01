@@ -1,27 +1,27 @@
 blueprint:
     name: Toggle Light(s) On Motion Detection
     description: '## Toggle Light(s) On Motion Detection
-	
-					choose the ignition time'
+                  
+                  choose the ignition time'
     domain: automation
     author: Beckynet
     homeassistant:
       min_version: 2024.8.0
     input:
-	motion_entity:
-	  name: Motion Sensor
-	  description: The motion detector that acts as a trigger
-	  selector:
-		entity:
-		  filter:
-			domain:
-			  - binary_sensor
-			device_class: 
-			  - occupancy
-			  - presence
-			  - motion
+      motion_entity:
+        name: Motion Sensor
+        description: The motion detector that acts as a trigger
+        selector:
+          entity:
+            filter:
+              domain:
+                - binary_sensor
+              device_class: 
+                - occupancy
+                - presence
+                - motion
 
-        wait_time:
+      wait_time:
           name: Wait Time
           description: Time to leave the light on after no presence is reported
           selector:
@@ -33,7 +33,7 @@ blueprint:
               unit_of_measurement: seconds
           default: 60
 
-        light_target:
+      light_target:
           name: Light
           description: Light(s) or Ligth group to control
           selector:
