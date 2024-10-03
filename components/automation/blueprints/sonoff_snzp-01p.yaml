@@ -15,7 +15,7 @@ blueprint:
     domain: automation
     author: Beckynet
     homeassistant:
-      min_version: 2024.8.0
+      min_version: 2024.10.0
     input:
       action_entity:
         name: SonOff Action
@@ -44,13 +44,13 @@ blueprint:
               - domain: light
             multiple: true
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input action_entity
 
-condition: []
+conditions: []
 
-action:
+actions:
   - variables:
       command: "{{ trigger.to_state.state }}"
   - choose:
