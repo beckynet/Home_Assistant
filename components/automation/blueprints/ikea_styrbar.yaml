@@ -22,6 +22,8 @@ blueprint:
                   - Press the **Right Arrow** button to increase the kelvin to up of 6535'
     domain: automation
     author: Beckynet
+    homeassistant:
+      min_version: 2024.10.0
     input:
       styrbar_entity:
         name: Styrbar remote
