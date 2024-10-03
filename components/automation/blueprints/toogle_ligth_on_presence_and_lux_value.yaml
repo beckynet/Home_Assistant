@@ -4,7 +4,7 @@ blueprint:
     domain: automation
     author: Beckynet
     homeassistant:
-      min_version: 2024.8.0
+      min_version: 2024.10.0
     input:
         presence_entity:
           name: Presence Sensor
@@ -51,18 +51,17 @@ blueprint:
                 domain:
                   - light
               multiple: true
-mode: single
 
 variables:
   automation_name: '{{ this.attributes.last_triggered }}'
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input presence_entity
     from: "off"
     to: "on"
     id: "on"
-  - platform: state
+  - trigger: state
     entity_id: !input presence_entity
     from: "on"
     to: "off"
@@ -71,8 +70,10 @@ trigger:
       minutes: 0
       seconds: !input wait_time
     id: "off"
-condition: []
-action:
+
+conditions: []
+
+actions:
   - if:
       - condition: and
         conditions:
@@ -98,3 +99,5 @@ action:
           entity_id: !input light_target
         data: {}
         action: light.turn_off
+
+mode: single
