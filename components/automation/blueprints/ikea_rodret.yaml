@@ -19,7 +19,7 @@ blueprint:
     domain: automation
     author: Beckynet
     homeassistant:
-      min_version: 2024.8.0
+      min_version: 2024.10.0
     input:
       rodret_entity:
         name: Rodret remote
@@ -43,13 +43,13 @@ variables:
   remote_control: !input rodret_entity
   light_entities: !input target_lights
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input rodret_entity
 
-condition: []
+conditions: []
 
-action:
+actions:
   - choose:
       - conditions:
           - condition: template
