@@ -13,7 +13,7 @@ blueprint:
     domain: automation
     author: Beckynet
     homeassistant:
-      min_version: 2024.8.0
+      min_version: 2024.10.0
     input:
       source_entity:
         name: Source entity
@@ -51,21 +51,21 @@ variables:
   action_on_target: !input target_action
 
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input source_entity
     from: "off"
     to: "on"
     id: "on"
-  - platform: state
+  - trigger: state
     entity_id: !input source_entity
     from: "on"
     to: "off"
     id: "off"
 
-condition: []
+conditions: []
 
-action:
+actions:
   - choose:
       - conditions:
           - condition: trigger
@@ -127,3 +127,4 @@ action:
                     target:
                       entity_id: !input target_entity
                     data: {}
+mode: single
