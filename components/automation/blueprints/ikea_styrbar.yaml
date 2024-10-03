@@ -44,13 +44,13 @@ blueprint:
 variables:
   light_entities: !input target_lights
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input styrbar_entity
 
-condition: []
+conditions: []
 
-action:
+actions:
   - variables:
       command: "{{ trigger.to_state.state }}"
   - choose:
