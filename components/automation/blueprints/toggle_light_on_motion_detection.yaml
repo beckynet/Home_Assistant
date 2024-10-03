@@ -6,7 +6,7 @@ blueprint:
     domain: automation
     author: Beckynet
     homeassistant:
-      min_version: 2024.8.0
+      min_version: 2024.10.0
     input:
       motion_entity:
         name: Motion Sensor
@@ -43,13 +43,13 @@ blueprint:
                   - light
               multiple: true
 
-trigger:
-  - platform: state
+triggers:
+  - trigger: state
     entity_id: !input motion_entity
     from: "off"
     to: "on"
     id: "on"
-  - platform: state
+  - trigger: state
     entity_id: !input motion_entity
     from: "on"
     to: "off"
@@ -59,9 +59,9 @@ trigger:
       minutes: 0
       seconds: !input wait_time
 
-condition: []
+conditions: []
 
-action:
+actions:
   - choose:
       - conditions:
           - condition: trigger
