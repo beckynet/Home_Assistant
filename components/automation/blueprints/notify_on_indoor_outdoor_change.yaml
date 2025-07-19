@@ -122,9 +122,6 @@ condition:
             {% endif %}
 
 action:
-#  - action: timer.start
-#    data:
-#      entity_id: timer.notifysalon_debounce
   - choose:
       - conditions:
           - condition: and
