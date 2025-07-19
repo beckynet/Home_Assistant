@@ -10,7 +10,6 @@ blueprint:
           selector:
             entity:
               filter:
-                - domain: sensor
                 - device_class: temperature
         indoor_temp_source:
           name: Indoor Temperature Sensor
