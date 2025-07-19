@@ -72,8 +72,7 @@ blueprint:
               multiple: true
         target_chat:
             name: Target Chat
-            description: 'The chat_id to be used by the Telegram bot. !secret chat_id is
-                not allowed on Blueprint, you will need the chat_id code.'
+            description: 'Enter a Telegram_Bot chat_id, if you wish to enter more than one separate them with a comma.'
             default: ''
         alexa_target:
           name: Alexa Device
@@ -92,10 +91,15 @@ variables:
   automation_name: '{{ this.attributes.last_triggered }}'
   list_contact_entities: !input contact_entities
   list_person_entities: !input person_entities
-  target_chat: !input target_chat
   hysteresis: !input hysteresis_temp
   outdoor_sensor: !input outdoor_temp_source
   indoor_sensor: !input indoor_temp_source
+  chat_ids: >-
+        {% if target_chat | string | length > 0 %}
+          {{ target_chat.split(',') | map('trim') | list }}
+        {% else %}
+          []
+        {% endif %}
 
 trigger:
   - trigger: state
@@ -145,16 +149,19 @@ action:
                   - condition: template
                     value_template: "{{ target_chat is defined and target_chat | string | length > 0 }}"
                 sequence:
-                  - action: telegram_bot.send_message
-                    metadata: {}
-                    data:
-                      target: '{{ target_chat }}'
-                      title: "{{ area_name(indoor_sensor) }}"
-                      message: >-
-                            {% set outdoor = states[outdoor_sensor].state|float %}
-                            {% set indoor = states[indoor_sensor].state| float %}
-                            Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                            {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+                  - repeat:
+                      for_each: "{{ chat_ids }}"
+                      sequence:
+                        - action: telegram_bot.send_message
+                          metadata: {}
+                          data:
+                            target: '{{ repeat.item }}'
+                            title: "{{ area_name(indoor_sensor) }}"
+                            message: >-
+                              {% set outdoor = states[outdoor_sensor].state|float %}
+                              {% set indoor = states[indoor_sensor].state| float %}
+                              Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                              {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
                 entity_id: !input alexa_target
@@ -179,16 +186,19 @@ action:
                   - condition: template
                     value_template: "{{ target_chat is defined and target_chat | string | length > 0 }}"
                 sequence:
-                  - action: telegram_bot.send_message
-                    metadata: {}
-                    data:
-                      target: '{{ target_chat }}'
-                      title: "{{ area_name(indoor_sensor) }}"
-                      message: >-
-                            {% set outdoor = states[outdoor_sensor].state|float %}
-                            {% set indoor = states[indoor_sensor].state| float %}
-                            Il faut fermer les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                            {{"{:.1f}".format((outdoor - indoor) | abs) }}°C d'écart avec l'extérieure
+                  - repeat:
+                      for_each: "{{ chat_ids }}"
+                      sequence:
+                        - action: telegram_bot.send_message
+                          metadata: {}
+                          data:
+                            target: '{{ repeat.item }}'
+                            title: "{{ area_name(indoor_sensor) }}"
+                            message: >-
+                              {% set outdoor = states[outdoor_sensor].state|float %}
+                              {% set indoor = states[indoor_sensor].state| float %}
+                              Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                              {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
                 entity_id: !input alexa_target
