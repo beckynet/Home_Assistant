@@ -146,13 +146,14 @@ action:
                 %} Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
                 {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
-            target: !input alexa_target
+            target:
+                entity_id: !input alexa_target
             data:
-              message: >-
-                {% set outdoor = states[outdoor_sensor].state|float %}
-                {% set indoor = states[indoor_sensor].state| float
-                %} Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+                message: >-
+                    {% set outdoor = states[outdoor_sensor].state|float %}
+                    {% set indoor = states[indoor_sensor].state| float %}
+                    Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                    {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
       - conditions:
           - condition: and
             conditions:
@@ -162,7 +163,7 @@ action:
                 alias: "Outdoor - Indoor Greater Of Hysteresis"
                 value_template: >-
                   {{ states[outdoor_sensor].state|float - states[indoor_sensor].state|float > hysteresis }}
-        sequence: 
+        sequence:
           - action: script.notify_send_message_to_telegram_group
             metadata: {}
             data:
@@ -173,11 +174,12 @@ action:
                 %} Il faut fermer les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
                 {{"{:.1f}".format((outdoor - indoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
-            target: !input alexa_target
+            target:
+                entity_id: !input alexa_target
             data:
-              message: >-
-                {% set outdoor = states[outdoor_sensor].state|float %}
-                {% set indoor = states[indoor_sensor].state| float
-                %} Il faut fermer les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                {{"{:.1f}".format((outdoor - indoor) | abs) }}°C d'écart avec l'extérieure
+                message: >-
+                    {% set outdoor = states[outdoor_sensor].state|float %}
+                    {% set indoor = states[indoor_sensor].state| float %}
+                    Il faut fermer les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                    {{"{:.1f}".format((outdoor - indoor) | abs) }}°C d'écart avec l'extérieure
 mode: single
