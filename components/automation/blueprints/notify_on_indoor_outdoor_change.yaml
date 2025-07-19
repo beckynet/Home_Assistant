@@ -17,7 +17,6 @@ blueprint:
           selector:
             entity:
               filter:
-                - domain: sensor
                 - device_class: temperature
         contact_entities:
           name: List Of Door or Windows Contact
