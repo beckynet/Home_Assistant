@@ -106,15 +106,11 @@ condition:
       - condition: time
         before: !input stop_hour
         after: !input start_hour
+
       - condition: numeric_state
         entity_id: !input outdoor_temp_source
         above: !input min_outdoor_temp
 
-#      - condition: not
-#        conditions:
-#      - condition: state
-#        entity_id: !input target_person
-#        state: home
       - condition: template
 #       value_template: "{{ expand(list_person_entities) | selectattr('state', 'eq', 'home') | list | count > 0 }}"
         value_template: >-
@@ -126,16 +122,13 @@ condition:
             {% endif %}
 
 action:
-  - action: timer.start
-    data:
-      entity_id: timer.notifysalon_debounce
+#  - action: timer.start
+#    data:
+#      entity_id: timer.notifysalon_debounce
   - choose:
       - conditions:
           - condition: and
             conditions:
-#              - condition: state
-#                entity_id: !input list_of_contact_entities
-#                state: "off"
               - condition: template
                 value_template: "{{ expand(list_contact_entities) | selectattr('state', 'eq', 'off') | list | count > 0 }}"
               - condition: template
@@ -152,11 +145,9 @@ action:
                 {% set indoor = states[indoor_sensor].state| float
                 %} Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
                 {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
-          - action: notify.alexa_media
+          - action: notify.send_message
+            target: !input alexa_target
             data:
-              target: !input alexa_target
-              data:
-                type: announce
               message: >-
                 {% set outdoor = states[outdoor_sensor].state|float %}
                 {% set indoor = states[indoor_sensor].state| float
@@ -165,9 +156,6 @@ action:
       - conditions:
           - condition: and
             conditions:
-#              - condition: state
-#                entity_id: !input list_of_contact_entities
-#                state: "on"
               - condition: template
                 value_template: "{{ expand(list_contact_entities) | selectattr('state', 'eq', 'on') | list | count > 0 }}"
               - condition: template
@@ -185,9 +173,8 @@ action:
                 %} Il faut fermer les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
                 {{"{:.1f}".format((outdoor - indoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
+            target: !input alexa_target
             data:
-              target: !input alexa_target
-              data:
               message: >-
                 {% set outdoor = states[outdoor_sensor].state|float %}
                 {% set indoor = states[indoor_sensor].state| float
