@@ -144,24 +144,19 @@ action:
                 value_template: >-
                   {{ states[indoor_sensor].state|float - states[outdoor_sensor].state|float > hysteresis }}
         sequence: 
-          - choose:
-              - conditions:
-                  - condition: template
-                    value_template: "{{ target_chat is defined and target_chat | string | length > 0 }}"
-                sequence:
-                  - repeat:
-                      for_each: "{{ chat_ids }}"
-                      sequence:
-                        - action: telegram_bot.send_message
-                          metadata: {}
-                          data:
-                            target: '{{ repeat.item }}'
-                            title: "{{ area_name(indoor_sensor) }}"
-                            message: >-
-                              {% set outdoor = states[outdoor_sensor].state|float %}
-                              {% set indoor = states[indoor_sensor].state| float %}
-                              Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                              {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+          - repeat:
+              for_each: "{{ chat_ids }}"
+              sequence:
+                - action: telegram_bot.send_message
+                  metadata: {}
+                  data:
+                    target: '{{ repeat.item }}'
+                    title: "{{ area_name(indoor_sensor) }}"
+                    message: >-
+                      {% set outdoor = states[outdoor_sensor].state|float %}
+                      {% set indoor = states[indoor_sensor].state| float %}
+                      Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                      {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
                 entity_id: !input alexa_target
@@ -181,24 +176,19 @@ action:
                 value_template: >-
                   {{ states[outdoor_sensor].state|float - states[indoor_sensor].state|float > hysteresis }}
         sequence:
-          - choose:
-              - conditions:
-                  - condition: template
-                    value_template: "{{ target_chat is defined and target_chat | string | length > 0 }}"
-                sequence:
-                  - repeat:
-                      for_each: "{{ chat_ids }}"
-                      sequence:
-                        - action: telegram_bot.send_message
-                          metadata: {}
-                          data:
-                            target: '{{ repeat.item }}'
-                            title: "{{ area_name(indoor_sensor) }}"
-                            message: >-
-                              {% set outdoor = states[outdoor_sensor].state|float %}
-                              {% set indoor = states[indoor_sensor].state| float %}
-                              Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                              {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+          - repeat:
+              for_each: "{{ chat_ids }}"
+              sequence:
+                - action: telegram_bot.send_message
+                  metadata: {}
+                  data:
+                    target: '{{ repeat.item }}'
+                    title: "{{ area_name(indoor_sensor) }}"
+                    message: >-
+                      {% set outdoor = states[outdoor_sensor].state|float %}
+                      {% set indoor = states[indoor_sensor].state| float %}
+                      Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                      {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
                 entity_id: !input alexa_target
