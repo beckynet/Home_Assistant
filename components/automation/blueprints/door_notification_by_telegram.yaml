@@ -57,21 +57,14 @@ triggers:
       id: "off"
 
 condition:
-    - condition: and
-      conditions:
-
-        - condition: time
-          before: !input stop_hour
-          after: !input start_hour
-
-        - condition: template
-          value_template: >-
-              {% set personnes = expand(list_person_entities) %}
-              {% if personnes | length == 0 %}
-                true
-              {% else %}
-                {{ personnes | selectattr('state', 'eq', 'home') | list | count <= 0 }}
-              {% endif %}
+    - condition: template
+      value_template: >-
+          {% set personnes = expand(list_person_entities) %}
+          {% if personnes | length == 0 %}
+            true
+          {% else %}
+            {{ personnes | selectattr('state', 'eq', 'home') | list | count <= 0 }}
+          {% endif %}
 
 actions:
 
