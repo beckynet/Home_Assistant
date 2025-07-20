@@ -2,7 +2,7 @@ blueprint:
   name: Frigate - Telegram Notification
   description: Create automations to receive Snapshots and Clips from Frigate
   domain: automation
-  autor: Beckynet
+  author: Beckynet
   input:
     camera:
       name: Frigate Camera
