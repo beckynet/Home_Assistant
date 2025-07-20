@@ -16,7 +16,7 @@ blueprint:
               multiple: true
         person_entities:
           name: Person
-          description: You will not be notified if any of these people are at home. When the list is empty you will always be notified.
+          description: Only notify if selected presence entity is not "home". Or empty.
           default: []
           selector:
             entity:
