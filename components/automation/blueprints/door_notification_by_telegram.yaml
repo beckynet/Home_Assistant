@@ -86,4 +86,16 @@ actions:
               message: >-
                 {% set status = {'on': 'Ouverte', 'off': 'Fermée'} %}
                 {% set conditions = trigger.to_state.state %}
-                La {{ trigger.to_state.attributes.friendly_name }} de la {{ area_name(trigger.entity_id) }} a été {{ status[conditions] if conditions in status.keys() else '?' }}
+                {% set classes = {'door': 'Porte', 'window': 'Fenêtre'} %}
+                {% set class = trigger.to_state.attributes.device_class %}
+                La {{ classes[class] if class in classes.keys() else '?' }} de la pièce {{ area_name(trigger.entity_id) }} a été {{ status[conditions] if conditions in status.keys() else '?' }}
+    - action: notify.send_message
+      target:
+        entity_id: !input target_alexa
+      data:
+        message: >-
+                {% set status = {'on': 'Ouverte', 'off': 'Fermée'} %}
+                {% set conditions = trigger.to_state.state %}
+                {% set classes = {'door': 'Porte', 'window': 'Fenêtre'} %}
+                {% set class = trigger.to_state.attributes.device_class %}
+                La {{ classes[class] if class in classes.keys() else '?' }} de la pièce {{ area_name(trigger.entity_id) }} a été {{ status[conditions] if conditions in status.keys() else '?' }}
