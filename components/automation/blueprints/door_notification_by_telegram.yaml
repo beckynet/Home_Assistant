@@ -67,7 +67,6 @@ condition:
           {% endif %}
 
 actions:
-
     - variables:
         chat_ids: >-
             {% if list_target_chat | string | length > 0 %}
