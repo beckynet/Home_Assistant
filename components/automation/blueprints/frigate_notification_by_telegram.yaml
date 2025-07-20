@@ -6,22 +6,18 @@ blueprint:
   input:
     camera:
       name: Frigate Camera
-      description: The name of the camera as defined in your frigate configuration frigate.yaml
+      description: The name of the camera as defined in your frigate configuration (/frigate.yaml).
     target_chat:
       name: Target
-      description: 'The chat_id to be used by the Telegram bot. !secret chat_id is
-        not allowed on Blueprint, you will need the chat_id code.'
+      description: 'The chat_id to be used by the Telegram bot. !secret chat_id is not allowed on Blueprint, you will need the chat_id code.'
     notification:
       name: Notification
-      description: 'Select "true" to disable notification, lave "false" to receive
-        notification. '
+      description: 'Select "true" to disable notification, lave "false" to receive notification.'
       selector:
         select:
           options:
           - 'true'
           - 'false'
-          custom_value: false
-          multiple: false
       default: 'false'
     base_url:
       name: (Optional) Base URL
@@ -52,32 +48,32 @@ blueprint:
       description: Only notify if selected presence entity is not "home".
       default: ''
       selector:
-        entity:
-          multiple: false
+        entity: {}
+
 mode: single
 max_exceeded: silent
 trigger:
   trigger: mqtt
   topic: frigate/events
-  payload: !input camera
+  payload: !input 'camera'
   value_template: '{{ value_json[''after''][''camera''] }}'
 variables:
   id: '{{ trigger.payload_json[''after''][''id''] }}'
   camera: '{{ trigger.payload_json[''after''][''camera''] }}'
   camera_name: '{{ camera | replace(''_'', '' '') | title }}'
-  target_chat: !input target_chat
+  target_chat: !input 'target_chat'
   object: '{{ trigger.payload_json[''after''][''label''] }}'
   label: '{{ object | title }}'
   entered_zones: '{{ trigger.payload_json[''after''][''entered_zones''] }}'
   type: '{{ trigger.payload_json[''type''] }}'
-  base_url: !input base_url
-  zone_only: !input zone_filter
-  input_zones: !input zones
+  base_url: !input 'base_url'
+  zone_only: !input 'zone_filter'
+  input_zones: !input 'zones'
   zones: '{{ input_zones | list }}'
-  input_labels: !input labels
+  input_labels: !input 'labels'
   labels: '{{ input_labels | list }}'
-  presence_entity: !input presence_filter
-  notification: !input notification
+  presence_entity: !input 'presence_filter'
+  notification: !input 'notification'
 condition:
 - '{{ type != ''end'' }}'
 - '{{ not zone_only or entered_zones|length > 0 }}'
@@ -89,8 +85,10 @@ action:
   data:
     target: '{{ target_chat }}'
     disable_notification: '{{ notification }}'
-    caption: 'Mouvement Detecté. Caméra: {{ camera_name }}'
-    url: '{{base_url}}/api/frigate/notifications/{{id}}/snapshot.jpg'
+    caption: |
+      Objet Detecté: {{ label }}. Caméra: {{ camera_name }} SnapShot
+    url: >-
+      {{base_url}}/api/frigate/notifications/{{id}}/snapshot.jpg
 - repeat:
     sequence:
     - wait_for_trigger:
@@ -107,6 +105,7 @@ action:
       data:
         target: '{{ target_chat }}'
         disable_notification: '{{ notification }}'
-        caption: 'Mouvement Detecté. Caméra: {{ camera_name }}'
-        url: '{{base_url}}/api/frigate/notifications/{{id}}/{{camera}}/clip.mp4'
+        caption: 'Objet Detecté: {{ label }}. Caméra: {{ camera_name }} Vidéo'
+        url: >-
+          {{base_url}}/api/frigate/notifications/{{id}}/{{camera}}/clip.mp4
     until: '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
