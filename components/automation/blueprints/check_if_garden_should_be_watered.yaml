@@ -65,8 +65,8 @@ blueprint:
           - domain:
             - sensor
     total_rain_fallen_plus_expected:
-      name: Total Expected Precipitation
-      description: Sensor Total Expected Precipitation
+      name: Total Rain Fallen Plus Expected
+      description: Sensor Total Rain Fallen Plus Expected
       selector:
         entity:
           multiple: false
