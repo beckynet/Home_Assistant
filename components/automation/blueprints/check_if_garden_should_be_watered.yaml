@@ -210,9 +210,8 @@ action:
           - condition: template
             value_template: >
               {% set days = states(days_since_last_watering_day) | float %}
-              {% set lower = mdbw_plus_3 | float %}
-              {% set upper = mdbw_plus_4 | float %}
-              {{ lower < days < upper }}
+               {% set upper = mdbw_plus_4 | float %}
+              {{ upper < days }}
         sequence:
           - action: script.turn_on
             metadata: {}
