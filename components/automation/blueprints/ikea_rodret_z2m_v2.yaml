@@ -1,7 +1,21 @@
 blueprint:
   name: IKEA Rodret Z2M V2
-  description: >
-    Permet de crontroler une lampe connectée avec une télécommande Rodret de IKEA. Compatible avec zigbee2mqtt.
+  description: '## Control Light(s) with IKEA RODRET (E2201) Dimmer remote (v2.0)
+
+
+                  Only for use with Zigbee2MQTT
+                  (cf [MQTT](https://www.home-assistant.io/integrations/mqtt) + [Z2M addon](https://github.com/zigbee2mqtt/hassio-zigbee2mqtt#installation))
+
+
+                  Available controls:
+
+                  - Press the **on** button to turn on the light(s)
+
+                  - Press the **off** button to turn off the light(s)
+
+                  - Press and hold the **on** button to increase the brightness
+
+                  - Press and hold the **off** button to decrease the brightness down to 10%'
   domain: automation
   author: Beckynet
   homeassistant:
@@ -33,7 +47,6 @@ blueprint:
             - light
           multiple: true
 
-
 trigger_variables:
   z2m_base_topic: !input z2m_base_topic
   z2m_device_name: !input z2m_device_name
@@ -41,7 +54,6 @@ trigger_variables:
 
 triggers:
   - trigger: mqtt
-#    topic: "{{ z2m_base_topic ~ '/' ~ z2m_device_name ~ '/action' }}"
     topic: "{{ z2m_base_topic }}/{{ z2m_device_name }}/action"
 actions:
   - choose:
