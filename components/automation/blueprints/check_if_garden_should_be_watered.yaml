@@ -108,6 +108,7 @@ variables:
   watering_duration: !input watering_duration
   days_since_last_watering_day: !input days_since_last_watering_day
   total_rain_fallen_plus_expected: !input total_rain_fallen_plus_expected
+
 triggers:
 - trigger: sun
   event: sunrise
@@ -123,7 +124,7 @@ actions:
       above: '36'
     - condition: numeric_state
       entity_id: !input total_rain_fallen_plus_expected
-      below: '25.1'
+      below: '20.1'
     - condition: numeric_state
       entity_id: !input days_since_last_watering_day
       above: !input minimal_days_between_watering
@@ -138,13 +139,12 @@ actions:
       data: {}
       target:
         entity_id: !input irrigation_script
+
   - conditions:
     - condition: template
       value_template: '{% set days = states(days_since_last_watering_day) | float
         %} {% set lower = mdbw_plus_2 | float %} {% set upper = mdbw_plus_4 | float
-        %} {{ lower < days < upper }}
-
-        '
+        %} {{ lower < days < upper }}'
     - condition: numeric_state
       entity_id: !input max_temp_measured
       above: '31'
@@ -163,13 +163,12 @@ actions:
       data: {}
       target:
         entity_id: !input irrigation_script
+
   - conditions:
     - condition: template
       value_template: '{% set days = states(days_since_last_watering_day) | float
         %} {% set lower = mdbw_plus_3 | float %} {% set upper = mdbw_plus_4 | float
-        %} {{ lower < days < upper }}
-
-        '
+        %} {{ lower < days < upper }}'
     - condition: numeric_state
       entity_id: !input max_temp_measured
       above: '26'
@@ -188,13 +187,12 @@ actions:
       data: {}
       target:
         entity_id: !input irrigation_script
+
   - conditions:
     - condition: template
       value_template: '{% set days = states(days_since_last_watering_day) | float
         %} {% set lower = mdbw_plus_3 | float %} {% set upper = mdbw_plus_4 | float
-        %} {{ lower < days < upper }}
-
-        '
+        %} {{ lower < days < upper }}'
     - condition: numeric_state
       entity_id: !input max_temp_measured
       above: '20'
@@ -213,10 +211,11 @@ actions:
       data: {}
       target:
         entity_id: !input irrigation_script
+
   - conditions:
     - condition: template
-      value_template: "{% set days = states(days_since_last_watering_day) | float
-        %}\n {% set upper = mdbw_plus_4 | float %}\n{{ upper < days }}\n"
+      value_template: '{% set days = states(days_since_last_watering_day) | float
+        %} {% set upper = mdbw_plus_4 | float %} {{ upper < days }}'
     sequence:
     - action: script.turn_on
       metadata: {}
