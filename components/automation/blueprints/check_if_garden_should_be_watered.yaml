@@ -92,7 +92,7 @@ blueprint:
           - domain:
             - script
 
-variables:
+trigger_variables:
   offset_sunrise: !input offset_sunrise
   minimal_days_between_watering: !input minimal_days_between_watering
   mdbw_plus_2: '{{ 2 + (minimal_days_between_watering | int) }}'
