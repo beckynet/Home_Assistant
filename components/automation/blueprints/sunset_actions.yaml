@@ -58,6 +58,7 @@ blueprint:
     light_target:
       name: Light
       description: Light(s) or Ligth group to control
+      default: null
       selector:
         entity:
           filter:
@@ -68,6 +69,7 @@ blueprint:
     switch_target:
       name: Switch
       description: Switch or Switch group to control
+      default: null
       selector:
         entity:
           filter:
@@ -154,3 +156,4 @@ actions:
                 data: {}
                 target:
                   entity_id: !input switch_target
+
