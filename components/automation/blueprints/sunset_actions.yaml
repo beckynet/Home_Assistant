@@ -62,7 +62,7 @@ blueprint:
     presence_helpers:
       name: Presence Helpers
       description: Presence Helpers
-      default: null
+      default: {}
       selector:
         entity:
           multiple: false
@@ -73,7 +73,7 @@ blueprint:
     light_target:
       name: Light
       description: Light(s) or Ligth group to control
-      default: null
+      default: {}
       selector:
         entity:
           filter:
@@ -84,7 +84,7 @@ blueprint:
     switch_target:
       name: Switch
       description: Switch or Switch group to control
-      default: null
+      default: {}
       selector:
         entity:
           filter:
@@ -171,6 +171,7 @@ actions:
                 data: {}
                 target:
                   entity_id: !input switch_target
+
 
 
 
