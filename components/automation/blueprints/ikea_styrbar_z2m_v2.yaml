@@ -46,10 +46,11 @@ blueprint:
       description: Light(s) or Ligth group to control
       selector:
         entity:
-          filter:
-          - domain:
-            - light
           multiple: true
+          filter:
+            - domain:
+              - light
+
 
 
 trigger_variables:
