@@ -1,17 +1,19 @@
 blueprint:
   name: Sunset Actions
-  description: 'this automation blueprint is designed to control lights and switches based on the sun’s position,\n
-                presence detection, and optional time-based conditions.\n
-                It offers a flexible and intelligent way to manage your home’s ambiance and energy usage.\n
-                🔧 What It Does:
-
+  description: '##This automation blueprint is designed to control lights and switches based on the sun’s position,
+                presence detection, and optional time-based conditions.
+                It offers a flexible and intelligent way to manage your home’s ambiance and energy usage.
+                
+                🔧 What It Does ?
+                
                 This automation performs three core actions depending on the time of day and user presence:
 
                 - At Sunset (with optional offset) If someone is home (presence helper is on), it turns on the selected lights and switches.
 
                 - At Sunrise It turns off the same lights and switches, restoring a daytime setting.
 
-                - At a Specific Time (default: 23:00) If the optional time condition is enabled, it checks whether the current time matches the interrupt time and then turns off the devices — useful for enforcing nighttime energy-saving or sleep routines.'
+                - At a Specific Time (default: 23:00) If the optional time condition is enabled,
+                it checks whether the current time matches the interrupt time and then turns off the devices — useful for enforcing nighttime energy-saving or sleep routines.'
   
   domain: automation
   author: Beckynet
@@ -169,6 +171,7 @@ actions:
                 data: {}
                 target:
                   entity_id: !input switch_target
+
 
 
 
