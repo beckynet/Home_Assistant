@@ -62,35 +62,36 @@ blueprint:
     presence_helpers:
       name: Presence Helpers
       description: Presence Helpers
-      default: {}
+      default: []
       selector:
         entity:
           multiple: false
           filter:
-          - domain:
-            - input_boolean
+            - domain:
+              - input_boolean
 
     light_target:
       name: Light
       description: Light(s) or Ligth group to control
-      default: {}
+      default: []
       selector:
         entity:
-          filter:
-          - domain:
-            - light
           multiple: true
-
+          filter:
+            - domain:
+              - light
+          
     switch_target:
       name: Switch
       description: Switch or Switch group to control
-      default: {}
+      default: []
       selector:
         entity:
-          filter:
-          - domain:
-            - switch
           multiple: true
+          filter:
+            - domain:
+              - switch
+          
 
 variables:
   offset_sunset: !input offset_sunset
@@ -171,6 +172,7 @@ actions:
                 data: {}
                 target:
                   entity_id: !input switch_target
+
 
 
 
