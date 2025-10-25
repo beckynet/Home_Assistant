@@ -24,9 +24,13 @@ blueprint:
     z2m_base_topic:
       name: Zigbee2MQTT Base Topic
       description: 'Zigbee2MQTT Base Topic, take a look in your Z2M configuration under Setting / MQTT / Base Topic
+        
         Note:
+        
           - These values are case sensitive.
+          
           - Respect lower and upper case letters
+          
         Sample : zigbee2mqtt/device name/action.'
       default: zigbee2mqtt
       selector:
