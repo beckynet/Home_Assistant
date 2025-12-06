@@ -39,8 +39,8 @@ blueprint:
           default: []
           selector:
             entity:
-              filter:
-                - domain: notify
+              domain: notify
+              integration: alexa_device
               multiple: true
 
 variables:
