@@ -30,7 +30,7 @@ blueprint:
           selector:
             entity:
               domain: notify
-              integration: telegram
+              integration: telegram_bot
               multiple: true
         target_alexa:
           name: Alexa Device
