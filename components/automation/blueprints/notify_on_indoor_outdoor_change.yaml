@@ -11,6 +11,7 @@ blueprint:
             entity:
               filter:
                 - device_class: temperature
+
         indoor_temp_source:
           name: Indoor Temperature Sensor
           description: Indoor Temperature Sensor, be sure the sensor is affected in a room
@@ -18,6 +19,7 @@ blueprint:
             entity:
               filter:
                 - device_class: temperature
+
         contact_entities:
           name: List Of Door or Windows Contact
           description: List of door or windows to check
@@ -28,18 +30,21 @@ blueprint:
                     - window
                     - door
               multiple: true
+
         start_hour:
           name: Start Hour For Notification
           description: Time when automation start to notify
           selector:
             time:
           default: "08:00:00"
+
         stop_hour:
           name: Stop Hour For Notification
           description: Time when automation stop to notify
           selector:
             time:
           default: "22:00:00"
+
         min_outdoor_temp:
           name: Min Outdoor Temperature
           description: Minimum Temperature To Activate Automation
@@ -50,6 +55,7 @@ blueprint:
               max: 45
               unit_of_measurement: °C
           default: 16
+
         hysteresis_temp:
           name: Hysteresis
           description: Minimum Delta Between Outdoor and Indoor To Be Notified
@@ -61,6 +67,7 @@ blueprint:
               step: 0.5
               unit_of_measurement: °C
           default: 1.5
+
         person_entities:
           name: Person
           description: This person must be at home to be notified (Optional)
@@ -70,32 +77,38 @@ blueprint:
               filter:
                 - domain: person
               multiple: true
-        target_chat:
-            name: Target Chat
-            description: 'Enter a Telegram_Bot chat_id, if you wish to enter more than one separate them with a comma.'
-            default: ''
-        alexa_target:
-          name: Alexa Device
-          
-          description: Alexa Device (Optional)
+
+        target_telegram:
+          name: Telegram Group
+          description: 'Select Telegram Chat Traget (Optional)'
           default: []
           selector:
             entity:
-              filter:
-                - domain: notify
+              domain: notify
+              integration: telegram_bot
+              multiple: true
+
+        target_alexa:
+          name: Alexa Devices
+          description: Alexa Devices (Optional)
+          default: []
+          selector:
+            entity:
+              domain: notify
+              integration: alexa_devices
               multiple: true
 
     source_url: https://github.com/beckynet/HomeAssistant/blob/main/notify_on_indoor_outdoor_temperature_change.yaml
 
 variables:
-  automation_name: '{{ this.attributes.last_triggered }}'
-  list_contact_entities: !input contact_entities
-  list_person_entities: !input person_entities
-  hysteresis: !input hysteresis_temp
-  outdoor_sensor: !input outdoor_temp_source
-  indoor_sensor: !input indoor_temp_source
-  alexa_target: !input alexa_target
-  list_target_chat: !input target_chat
+    automation_name: '{{ this.attributes.last_triggered }}'
+    list_contact_entities: !input contact_entities
+    list_person_entities: !input person_entities
+    hysteresis: !input hysteresis_temp
+    outdoor_sensor: !input outdoor_temp_source
+    indoor_sensor: !input indoor_temp_source
+    list_target_telegram: !input target_telegram
+    list_target_alexa: !input target_alexa
 
 trigger:
   - trigger: state
@@ -139,35 +152,25 @@ action:
                 value_template: >-
                   {{ states[indoor_sensor].state|float - states[outdoor_sensor].state|float > hysteresis }}
         sequence:
-          - variables:
-               chat_ids: >-
-                    {% if list_target_chat | string | length > 0 %}
-                        {{ list_target_chat.split(',') | map('trim') | list }}
-                    {% else %}
-                        []
-                    {% endif %}
-          - repeat:
-              for_each: "{{ chat_ids }}"
-              sequence:
-                - action: telegram_bot.send_message
-                  metadata: {}
-                  data:
-                    target: '{{ repeat.item }}'
-                    title: "{{ area_name(indoor_sensor) }}"
-                    message: >-
-                      {% set outdoor = states[outdoor_sensor].state|float %}
-                      {% set indoor = states[indoor_sensor].state| float %}
-                      Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                      {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
-                entity_id: !input alexa_target
+              entity_id: !input target_telegram
             data:
-                message: >-
-                    {% set outdoor = states[outdoor_sensor].state|float %}
-                    {% set indoor = states[indoor_sensor].state| float %}
-                    Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                    {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+              title: "{{ area_name(indoor_sensor) }}"
+              message: >-
+                {% set outdoor = states[outdoor_sensor].state|float %}
+                {% set indoor = states[indoor_sensor].state| float %}
+                Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+          - action: notify.send_message
+            target:
+              entity_id: !input target_alexa
+            data:
+              message: >-
+                {% set outdoor = states[outdoor_sensor].state|float %}
+                {% set indoor = states[indoor_sensor].state| float %}
+                Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
       - conditions:
           - condition: and
             conditions:
@@ -178,29 +181,19 @@ action:
                 value_template: >-
                   {{ states[outdoor_sensor].state|float - states[indoor_sensor].state|float > hysteresis }}
         sequence:
-          - variables:
-               chat_ids: >-
-                    {% if list_target_chat | string | length > 0 %}
-                        {{ list_target_chat.split(',') | map('trim') | list }}
-                    {% else %}
-                        []
-                    {% endif %}
-          - repeat:
-              for_each: "{{ chat_ids }}"
-              sequence:
-                - action: telegram_bot.send_message
-                  metadata: {}
-                  data:
-                    target: '{{ repeat.item }}'
-                    title: "{{ area_name(indoor_sensor) }}"
-                    message: >-
-                      {% set outdoor = states[outdoor_sensor].state|float %}
-                      {% set indoor = states[indoor_sensor].state| float %}
-                      Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
-                      {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
           - action: notify.send_message
             target:
-                entity_id: !input alexa_target
+              entity_id: !input target_telegram
+            data:
+              title: "{{ area_name(indoor_sensor) }}"
+              message: >-
+                {% set outdoor = states[outdoor_sensor].state|float %}
+                {% set indoor = states[indoor_sensor].state| float %}
+                Il faut ouvrir les fenêtres de la pièce {{ area_name(indoor_sensor) }}, il y a
+                {{"{:.1f}".format((indoor - outdoor) | abs) }}°C d'écart avec l'extérieure
+          - action: notify.send_message
+            target:
+                entity_id: !input target_alexa
             data:
                 message: >-
                     {% set outdoor = states[outdoor_sensor].state|float %}
