@@ -23,10 +23,15 @@ blueprint:
               filter:
                 - domain: person
               multiple: true
-        target_chat:
-            name: Target Chat
-            description: 'Enter a Telegram_Bot chat_id, if you wish to enter more than one separate them with a comma.'
-            default: ''
+        target_telegram:
+          name: Telegram Group
+          description: 'Select Telegram Chat Traget (Optional)'
+          default: []
+          selector:
+            entity:
+              domain: notify
+              integration: telegram
+              multiple: true
         target_alexa:
           name: Alexa Device
           
@@ -41,7 +46,7 @@ blueprint:
 variables:
     list_contact_entities: !input contact_entities
     list_person_entities: !input person_entities
-    list_target_chat: !input target_chat
+    list_target_telegram: !input target_telegram
     list_target_alexa: !input target_alexa
 
 triggers:
@@ -67,22 +72,12 @@ condition:
           {% endif %}
 
 actions:
-    - variables:
-        chat_ids: >-
-            {% if list_target_chat | string | length > 0 %}
-                {{ list_target_chat.split(',') | map('trim') | list }}
-            {% else %}
-                []
-            {% endif %}
-    - repeat:
-        for_each: "{{ chat_ids }}"
-        sequence:
-          - action: telegram_bot.send_message
-            metadata: {}
-            data:
-              target: '{{ repeat.item }}'
-              title: "{{ area_name(trigger.entity_id) }}"
-              message: >-
+    - action: notify.send_message
+        target:
+          entity_id: !input target_telegram
+        data:
+          title: "{{ area_name(trigger.entity_id) }}"
+          message: >-
                 {% set status = {'on': 'Ouverte', 'off': 'Fermée'} %}
                 {% set conditions = trigger.to_state.state %}
                 {% set classes = {'door': 'Porte', 'window': 'Fenêtre'} %}
