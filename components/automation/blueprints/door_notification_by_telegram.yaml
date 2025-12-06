@@ -77,7 +77,7 @@ actions:
         entity_id: !input target_telegram
       data:
         title: "{{ area_name(trigger.entity_id) }}"
-         message: >-
+        message: >-
                 {% set status = {'on': 'Ouverte', 'off': 'Fermée'} %}
                 {% set conditions = trigger.to_state.state %}
                 {% set classes = {'door': 'Porte', 'window': 'Fenêtre'} %}
