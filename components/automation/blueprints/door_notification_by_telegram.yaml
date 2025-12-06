@@ -33,14 +33,14 @@ blueprint:
               integration: telegram_bot
               multiple: true
         target_alexa:
-          name: Alexa Device
+          name: Alexa Devices
           
-          description: Alexa Device (Optional)
+          description: Alexa Devices (Optional)
           default: []
           selector:
             entity:
               domain: notify
-              integration: alexa_device
+              integration: alexa_devices
               multiple: true
 
 variables:
