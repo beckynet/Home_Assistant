@@ -1,0 +1,96 @@
+blueprint:
+  name: Notification Customized of Waste collections
+  description: |
+    ## Notification Customized of Waste collections (v2.0)
+
+    Only for use with (cf [RecycleApp](https://github.com/olibos/HomeAssistant-RecycleApp/))
+    
+    ***Available controls:***
+
+    - Selection of the type of residue collection to be followed
+
+    - Choice of announcement time
+
+    - Telegram notification option
+
+    - Alexa Device(s) notification option
+  domain: automation
+  author: Beckynet
+  input:
+    collect_list:
+      name: List Of Collect
+      description: List of collect you want to follow
+      default: []
+      selector:
+        entity:
+          domain:
+            sensor
+          integration: recycle_app
+          multiple: true
+          reorder: false
+    trigger_time:
+      name: Trigger time
+      description: Select the trigger time
+      selector:
+        time: {}
+    target_telegram:
+      name: Telegram Group
+      description: Select Telegram Chat Traget (Optional)
+      default: []
+      selector:
+        entity:
+          domain:
+          - notify
+          integration: telegram_bot
+          multiple: true
+          reorder: false
+    target_alexa:
+      name: Alexa Devices
+      description: Alexa Devices (Optional)
+      default: []
+      selector:
+        entity:
+          domain:
+          - notify
+          integration: alexa_devices
+          multiple: true
+          reorder: false
+variables:
+  list_collect: !input collect_list
+  list_target_telegram: !input target_telegram
+  list_target_alexa: !input target_alexa
+trigger:
+  - platform: time
+    at: !input trigger_time
+actions:
+- action: notify.send_message
+  target:
+    entity_id: !input target_telegram
+  data:
+    title: '*📢 Ramassage des Ordures*'
+    message: >-
+        {% set tomorrow_pickups = namespace(entities=[]) %} {% set pickup_day = namespace(state = false) %}
+        {% set collect_types = list_collect %}
+        {% for collect_type in collect_types %}
+          {% if state_attr(collect_type, 'days') == 1 %}
+            {% set pickup_day.state = true %}
+            {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
+          {% endif %}
+        {% endfor %} {% if pickup_day.state == true %}
+          Demain collecte  {{ tomorrow_pickups.entities |join(' et ') }}
+        {% endif %}
+- action: notify.send_message
+  target:
+    entity_id: !input target_alexa
+  data:
+    message: >-
+        {% set tomorrow_pickups = namespace(entities=[]) %} {% set pickup_day = namespace(state = false) %}
+        {% set collect_types = list_collect %}
+        {% for collect_type in collect_types %}
+          {% if state_attr(collect_type, 'days') == 1 %}
+            {% set pickup_day.state = true %}
+            {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
+          {% endif %}
+        {% endfor %} {% if pickup_day.state == true %}
+          Demain collecte {{ tomorrow_pickups.entities |join(' et ') }}
+        {% endif %}
