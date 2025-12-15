@@ -28,11 +28,13 @@ blueprint:
           integration: recycle_app
           multiple: true
           reorder: false
+
     trigger_time:
       name: Trigger time
       description: Select the trigger time
       selector:
         time: {}
+
     target_telegram:
       name: Telegram Group
       description: Select Telegram Chat Traget (Optional)
@@ -44,6 +46,7 @@ blueprint:
           integration: telegram_bot
           multiple: true
           reorder: false
+
     target_alexa:
       name: Alexa Devices
       description: Alexa Devices (Optional)
@@ -55,14 +58,32 @@ blueprint:
           integration: alexa_devices
           multiple: true
           reorder: false
+
 variables:
   list_collect: !input collect_list
   list_target_telegram: !input target_telegram
   list_target_alexa: !input target_alexa
+
 trigger:
   - platform: time
     at: !input trigger_time
+
+conditions:
+  - condition: template
+    value_template: >-
+      {% set tomorrow_pickups = namespace(entities=[]) %}
+      {% set pickup_day = namespace(state = false) %}
+      {% set collect_types = list_collect %}
+      {% for collect_type in collect_types %}
+        {% if state_attr(collect_type, 'days') == 1 %}
+          {% set pickup_day.state = true %}
+          {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
+        {% endif %}
+      {% endfor %}
+      {{ pickup_day.state }}
+
 actions:
+
 - action: notify.send_message
   target:
     entity_id: !input target_telegram
@@ -79,6 +100,7 @@ actions:
         {% endfor %} {% if pickup_day.state == true %}
           Demain collecte  {{ tomorrow_pickups.entities |join(' et ') }}
         {% endif %}
+
 - action: notify.send_message
   target:
     entity_id: !input target_alexa
