@@ -86,7 +86,7 @@ action:
     target: '{{ target_chat }}'
     disable_notification: '{{ notification }}'
     caption: |
-      Objet Detecté: {{ label }}. Caméra: {{ camera_name }} SnapShot
+      Objet Detecté: {{ label }} sur Caméra: {{ camera_name }} SnapShot
     url: >-
       {{base_url}}/api/frigate/notifications/{{id}}/snapshot.jpg
 - repeat:
@@ -105,7 +105,8 @@ action:
       data:
         target: '{{ target_chat }}'
         disable_notification: '{{ notification }}'
-        caption: 'Objet Detecté: {{ label }}. Caméra: {{ camera_name }} Vidéo'
+        caption: 'Objet Detecté: {{ label }} sur Caméra: {{ camera_name }} Vidéo'
         url: >-
           {{base_url}}/api/frigate/notifications/{{id}}/{{camera}}/clip.mp4
     until: '{{ wait.trigger.payload_json[''type''] == ''end'' }}'
+
