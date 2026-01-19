@@ -1,0 +1,110 @@
+blueprint:
+  name: Notification On Low Battery
+  description: >
+    Regularly checks all battery sensors and triggers an action if their
+    battery level is below a configurable threshold.
+  domain: automation
+
+  input:
+    threshold:
+      name: Battery threshold (%)
+      description: Devices with battery below this percentage will be reported.
+      default: 40
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+          step: 1
+
+    time:
+      name: Time to test
+      description: Time of day when the test should run.
+      default: "10:00:00"
+      selector:
+        time: {}
+
+    day:
+      name: Weekday to test
+      description: >
+        Run every day (0) or only on a specific weekday (1=Mon ... 7=Sun)
+      default: 0
+      selector:
+        number:
+          min: 0
+          max: 7
+          mode: slider
+          step: 1
+
+    exclude:
+      name: Excluded battery sensors
+      description: >
+        Battery sensors to exclude from detection.
+      default:
+        entity_id: []
+      selector:
+        target:
+          entity:
+            - domain: sensor
+
+    target_telegram:
+      name: Telegram Group
+      description: Select Telegram Chat Traget (Optional)
+      default: []
+      selector:
+        entity:
+          domain:
+          - notify
+          integration: telegram_bot
+          multiple: true
+          reorder: false
+
+    actions:
+      name: Actions
+      description: >
+        Actions to run when low-battery devices are detected.
+        {{ batteries }} will contain the list of devices.
+      default: []
+      selector:
+        action: {}
+
+variables:
+  threshold: !input threshold
+  day: !input day
+  exclude: !input exclude
+  list_target_telegram: !input target_telegram
+
+  batteries: >
+    {% set result = namespace(list=[]) %}
+    {% for state in states.sensor
+         | selectattr('attributes.device_class', 'defined')
+         | selectattr('attributes.device_class', '==', 'battery') %}
+      {% if state.entity_id not in exclude.entity_id %}
+        {% set level = state.state | int(default=999) %}
+        {% if level != 999 and level <= threshold %}
+          {% set result.list = result.list + [ state.name ~ " (" ~ level ~ "%)" ] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {{ result.list | join(', ') }}
+
+trigger:
+  - platform: time
+    at: !input time
+
+condition:
+  - "{{ batteries != '' and (day | int == 0 or day | int == now().isoweekday()) }}"
+
+action:
+  - action: notify.send_message
+    target:
+      entity_id: !input target_telegram
+    data:
+      title: "*🪫Low Battery*"
+      message: "{{ batteries }}"
+
+  - choose: []
+    default: !input actions
+
+mode: single
