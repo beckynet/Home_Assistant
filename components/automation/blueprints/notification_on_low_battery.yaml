@@ -1,10 +1,10 @@
 blueprint:
   name: Notification On Low Battery
-  description: >
-    Regularly checks all battery sensors and triggers an action if their
+  description: 'Regularly checks all battery sensors and triggers an action if their
     battery level is below a configurable threshold.
-  domain: automation
 
+    '
+  domain: automation
   input:
     threshold:
       name: Battery threshold (%)
@@ -12,41 +12,39 @@ blueprint:
       default: 40
       selector:
         number:
-          min: 1
-          max: 100
-          unit_of_measurement: "%"
+          min: 1.0
+          max: 100.0
+          unit_of_measurement: '%'
           mode: slider
-          step: 1
-
+          step: 1.0
     time:
       name: Time to test
       description: Time of day when the test should run.
-      default: "10:00:00"
+      default: '10:00:00'
       selector:
         time: {}
-
     day:
       name: Weekday to test
-      description: >
-        Run every day (0) or only on a specific weekday (1=Mon ... 7=Sun)
+      description: 'Run every day (0) or only on a specific weekday (1=Mon ... 7=Sun)
+
+        '
       default: 0
       selector:
         number:
-          min: 0
-          max: 7
+          min: 0.0
+          max: 7.0
           mode: slider
-          step: 1
+          step: 1.0
 
     exclude:
       name: Excluded battery sensors
-      description: >
-        Battery sensors to exclude from detection.
-      default:
-        entity_id: []
+      description: 'Sélectionnez uniquement des capteurs de batterie à exclure.'
+      default: []
       selector:
-        target:
-          entity:
-            - domain: sensor
+        entity:
+          domain: sensor
+          device_class: battery
+          multiple: true
 
     target_telegram:
       name: Telegram Group
@@ -59,16 +57,14 @@ blueprint:
           integration: telegram_bot
           multiple: true
           reorder: false
-
     actions:
       name: Actions
-      description: >
-        Actions to run when low-battery devices are detected.
-        {{ batteries }} will contain the list of devices.
+      description: 'Actions to run when low-battery devices are detected. {{ batteries }} will contain the list of devices.'
       default: []
       selector:
         action: {}
 
+  source_url: https://github.com/beckynet/Home_Assistant/blob/main/components/automation/blueprints/notification_on_low_battery.yaml
 variables:
   threshold: !input threshold
   day: !input day
@@ -78,9 +74,9 @@ variables:
   batteries: >
     {% set result = namespace(list=[]) %}
     {% for state in states.sensor
-         | selectattr('attributes.device_class', 'defined')
-         | selectattr('attributes.device_class', '==', 'battery') %}
-      {% if state.entity_id not in exclude.entity_id %}
+        | selectattr('attributes.device_class', 'defined')
+        | selectattr('attributes.device_class', '==', 'battery') %}
+      {% if state.entity_id not in exclude %}
         {% set level = state.state | int(default=999) %}
         {% if level != 999 and level <= threshold %}
           {% set result.list = result.list + [ state.name ~ " (" ~ level ~ "%)" ] %}
@@ -89,22 +85,37 @@ variables:
     {% endfor %}
     {{ result.list | join(', ') }}
 
+  # Liste des batteries indisponibles
+  batteries_indisponibles: >
+    {% set result = namespace(list=[]) %}
+    {% for state in states.sensor
+        | selectattr('attributes.device_class', 'defined')
+        | selectattr('attributes.device_class', '==', 'battery') %}
+      {% if state.entity_id not in exclude %}
+        {% if state.state in ['unknown', 'unavailable', 'None'] %}
+          {% set result.list = result.list + [ state.name ] %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+    {{ result.list | join(', ') }}
+
+
+
 trigger:
-  - platform: time
-    at: !input time
-
+- platform: time
+  at: !input time
 condition:
-  - "{{ batteries != '' and (day | int == 0 or day | int == now().isoweekday()) }}"
-
+- '{{ batteries != '''' and (day | int == 0 or day | int == now().isoweekday()) }}'
 action:
-  - action: notify.send_message
-    target:
-      entity_id: !input target_telegram
-    data:
-      title: "*🪫Low Battery*"
-      message: "{{ batteries }}"
-
-  - choose: []
-    default: !input actions
-
+- action: notify.send_message
+  target:
+    entity_id: !input target_telegram
+  data:
+    title: "*\U0001FAABBatteries*"
+    message: "_*Batteries faibles:*_\n
+    {{ batteries | replace('_','\\_') | replace('(','\\(') | replace(')','\\)') | replace('*','\\*') | replace('-','\\-') | replace('.','\\.') }}
+    \n_*Batteries vides:*_\n
+    {{ batteries_indisponibles | replace('_','\\_') | replace('(','\\(') | replace(')','\\)') | replace('*','\\*') | replace('-','\\-') | replace('.','\\.') }}"
+- choose: []
+  default: !input actions
 mode: single
