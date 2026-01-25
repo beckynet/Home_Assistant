@@ -98,7 +98,7 @@ actions:
             {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
           {% endif %}
         {% endfor %} {% if pickup_day.state == true %}
-          Demain collecte  {{ tomorrow_pickups.entities |join(' et ') }}
+          {{ ('Demain collecte ' ~ tomorrow_pickups.entities | join(' et ')) | regex_replace('([_*\[\]\(\)~`>#+\-=|{}.!])', '\\\\\1') }}
         {% endif %}
 
 - action: notify.send_message
