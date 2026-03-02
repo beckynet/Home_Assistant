@@ -59,6 +59,18 @@ blueprint:
           multiple: true
           reorder: false
 
+    target_media_players:
+      name: Media Players
+      description: Media Player (optional)
+      default: []
+      selector:
+        entity:
+          domain:
+            - media_player
+          multiple: true
+          reorder: false
+
+
 variables:
   list_collect: !input collect_list
   list_target_telegram: !input target_telegram
@@ -116,3 +128,22 @@ actions:
         {% endfor %} {% if pickup_day.state == true %}
           Demain collecte {{ tomorrow_pickups.entities |join(' et ') }}
         {% endif %}
+
+- action: media_player.play_media
+  target:
+    entity_id: !input target_media_players
+  data:
+    media_content_type: "announce"
+    media_content_id: >-
+      {% set tomorrow_pickups = namespace(entities=[]) %}
+      {% set pickup_day = namespace(state = false) %}
+      {% set collect_types = list_collect %}
+      {% for collect_type in collect_types %}
+        {% if state_attr(collect_type, 'days') == 1 %}
+          {% set pickup_day.state = true %}
+          {% set tomorrow_pickups.entities = tomorrow_pickups.entities + [state_attr(collect_type, 'friendly_name')] %}
+        {% endif %}
+      {% endfor %}
+      {% if pickup_day.state == true %}
+        Demain collecte {{ tomorrow_pickups.entities | join(' et ') }}
+      {% endif %}
